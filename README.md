@@ -1,0 +1,2 @@
+# ExpenseControlApplication
+Training some skills
