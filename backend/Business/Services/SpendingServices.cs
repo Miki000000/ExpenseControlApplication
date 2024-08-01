@@ -13,16 +13,6 @@ public class SpendingServices(ISpendingRepository spendingRepo)
 {
     public async Task<CreateSpendingDto?> CreateAsync(SpendingDto spendingDto, string username)
     {
-        var user = await userManager.Users.FirstOrDefaultAsync(u => u.UserName == username);
-        if (user == null) return null;
-        var userId = await userManager.GetUserIdAsync(user);
-        Spending spending = spendingDto.FromCreateToSpending(userId);
-        await context.Spendings.AddAsync(spending);
-        await context.SaveChangesAsync();
-        user.Money -= spendingDto.ValueSpended;
-        user.TotalSpent += spendingDto.ValueSpended;
-        await userManager.UpdateAsync(user);
-        return spending.FromSpendingToDto();
         var spending = await spendingRepo.CreateAsync(spendingDto, username);
         return spending?.FromSpendingToDto();
     }
@@ -35,5 +25,7 @@ public class SpendingServices(ISpendingRepository spendingRepo)
 
     public async Task<CreateSpendingDto?> DeleteAsync(int spendingId, string username)
     {
+        var deletedSpending = await spendingRepo.DeleteUserSpendingAsync(username, spendingId);
+        return deletedSpending?.FromSpendingToDto();
     }
 }
