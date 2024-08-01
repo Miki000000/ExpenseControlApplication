@@ -19,6 +19,7 @@ builder.Services.AddScoped<IUserServices, UserServices>();
 builder.Services.AddScoped<ISpendingServices, SpendingServices>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<ISpendingRepository, SpendingRepository>();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
