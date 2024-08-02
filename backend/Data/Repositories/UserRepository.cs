@@ -1,5 +1,6 @@
 using ExpenseControlApplication.Business.Interfaces;
 using ExpenseControlApplication.Data.Entities;
+using ExpenseControlApplication.Data.Factories;
 using ExpenseControlApplication.Data.Interfaces;
 using ExpenseControlApplication.Presentation.UserPresentation;
 using Microsoft.AspNetCore.Identity;
