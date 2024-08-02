@@ -19,5 +19,16 @@ public static class UserMapper
             Spendings = userDto.Spendings.Select(s => s.FromSpendingToDto()).ToList()
         };
     }
-    
+
+    public static User FromDtoToUser(this RegisterUserDto userDto)
+    {
+        return new User()
+        {
+            UserName = userDto.Username,
+            Money = userDto.Money,
+            TotalGot = userDto.Money,
+            Email = userDto.Email!,
+            TotalSpent = userDto.Money,
+        };
+    }
 }

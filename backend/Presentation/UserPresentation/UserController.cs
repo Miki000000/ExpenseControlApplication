@@ -11,8 +11,15 @@ public class UserController(IUserServices userServices) : ControllerBase
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterUserDto userDto)
     {
-        var newUser = await userServices.RegisterUser(userDto);
-        return newUser != null ? Ok(newUser) : NotFound();
+        try
+        {
+            var newUser = await userServices.RegisterUser(userDto);
+            return Ok(newUser);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { Message = ex.Message });
+        }
     }
 
     [HttpPost("login")]

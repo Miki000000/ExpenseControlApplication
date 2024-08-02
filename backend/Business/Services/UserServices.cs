@@ -11,10 +11,16 @@ namespace ExpenseControlApplication.Business.Services;
 public class UserServices(IUserRepository userRepo) 
     : IUserServices
 {
-    public async Task<UserDto?> RegisterUser(RegisterUserDto userDto)
+    public async Task<UserDto> RegisterUser(RegisterUserDto userDto)
     {
         var newUser = await userRepo.RegisterUserAsync(userDto); 
         return newUser;
+        var user = userDto.FromDtoToUser();
+        var userStatus = await userRepo.RegisterUserAsync(user, userDto.Password);
+        if (!userStatus.success)
+            throw new DefaultException(userStatus.message!);
+        var securityToken = tokenService.CreateToken(user);
+        return user.FromUserToNewUser(securityToken);
     }
 
     public async Task<(UserDto? user, string? error)> LoginUser(LoginUserDto userDto)

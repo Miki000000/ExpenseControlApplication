@@ -9,24 +9,21 @@ namespace ExpenseControlApplication.Data.Repositories;
 
 public class UserRepository(UserManager<User> userManager, ITokenService tokenService, SignInManager<User> signInManager) 
     : IUserRepository
-
 {
-    public async Task<UserDto?> RegisterUserAsync(RegisterUserDto userDto)
+    public async Task<Status> RegisterUserAsync(User user, string password)
     {
-        var user = new User
-        {
-            UserName = userDto.Username,
-            Email = userDto.Email,
-            Money = userDto.Money,
-            TotalGot = userDto.Money,
-            TotalSpent = 0
-        };
-        var createdUser = await userManager.CreateAsync(user, userDto.Password);
-        if (!createdUser.Succeeded) return null;
+        var createdUser = await userManager.CreateAsync(user, password);
+        if (!createdUser.Succeeded)
+            return StatusFactory.CreateStatus(false,
+                string.Join(", ", createdUser.Errors.ToList().Select(e => e.Description)));
+        
         var roleResult = await userManager.AddToRoleAsync(user, "User");
-        if (!roleResult.Succeeded) return null;
-        var securityToken = tokenService.CreateToken(user);
-        return user.FromUserToNewUser(securityToken);
+        if (!roleResult.Succeeded)
+        {
+            return StatusFactory.CreateStatus(false,
+                string.Join(", ", roleResult.Errors.ToList().Select(e => e.Description)));
+        }
+        return StatusFactory.CreateStatus(true);
     }
 
     public async Task<LoginResult> LoginAsync(LoginUserDto userDto)
