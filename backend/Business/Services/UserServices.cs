@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ExpenseControlApplication.Business.Services;
 
-public class UserServices(IUserRepository userRepo) 
+public class UserServices(IUserRepository userRepo, ITokenService tokenService) 
     : IUserServices
 {
     public async Task<UserDto> RegisterUser(RegisterUserDto userDto)
