@@ -1,5 +1,5 @@
 using ExpenseControlApplication.Business.Interfaces;
-using ExpenseControlApplication.Data.Entities;
+using ExpenseControlApplication.Utils.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ExpenseControlApplication.Presentation.UserPresentation;
@@ -25,7 +25,19 @@ public class UserController(IUserServices userServices) : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginUserDto userDto)
     {
-        var (user, error) = await userServices.LoginUser(userDto);
-        return user == null ? StatusCode(500, error) : Ok(user);
+        try
+        {
+            var user = await userServices.LoginUser(userDto);
+            return Ok(user);
+        }
+        catch (Exception ex)
+        {
+            var statusCode = ex switch
+            {
+                InvalidEntryException => 400,
+                _ => 500,
+            };
+            return StatusCode(statusCode, new { Message = ex.Message });
+        }
     }
 }

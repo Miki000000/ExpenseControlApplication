@@ -12,6 +12,6 @@ public class LoginResult
 
 public interface IUserServices
 {
-    public Task<UserDto?> RegisterUser(RegisterUserDto userDto);
-    public Task<(UserDto? user, string? error)> LoginUser(LoginUserDto userDto);
+    public Task<UserDto> RegisterUser(RegisterUserDto userDto);
+    public Task<UserDto> LoginUser(LoginUserDto userDto);
 }
