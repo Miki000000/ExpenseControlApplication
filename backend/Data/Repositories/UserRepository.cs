@@ -30,10 +30,10 @@ public class UserRepository(UserManager<User> userManager, ITokenService tokenSe
     public async Task<LoginResult> LoginAsync(LoginUserDto userDto)
     {
         var user = await userManager.Users.Include(u => u.Spendings)
-            .FirstOrDefaultAsync(user => user.UserName!.ToLower() == user.UserName.ToLower());
-        if (user == null) return new LoginResult { Error = "Invalid Username" };
+            .FirstOrDefaultAsync(user => user.UserName!.ToLower() == userDto.Username.ToLower());
+        if (user == null) return new LoginResult { Error = "Username" };
         var sign = await signInManager.CheckPasswordSignInAsync(user, userDto.Password, false);
-        if (!sign.Succeeded) return new LoginResult { Error = "Invalid Password" };
+        if (!sign.Succeeded) return new LoginResult { Error = "Password" };
         var token = tokenService.CreateToken(user);
         return new LoginResult
         {
