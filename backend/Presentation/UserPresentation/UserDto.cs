@@ -25,6 +25,12 @@ public class RegisterUserDto
     public string Password { get; set; } = null!;
     public decimal Money { get; set; }
 }
+public class UpdateUserDto
+{
+    [Required]
+    public decimal Money { get; set; }
+}
+
 
 public class LoginUserDto
 {

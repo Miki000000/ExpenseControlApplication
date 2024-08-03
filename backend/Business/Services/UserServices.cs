@@ -16,18 +16,34 @@ public class UserServices(IUserRepository userRepo, ITokenService tokenService)
     {
         var user = userDto.FromDtoToUser();
         var userStatus = await userRepo.RegisterUserAsync(user, userDto.Password);
-        if (!userStatus.success)
-            throw new DefaultException(userStatus.message!);
+        if (!userStatus.Succeeded)
+            throw new DefaultException(string.Join(", ", userStatus.Errors.ToList().Select(e => e.Description)));
+        var roleStatus = await userRepo.RegisterRoleOnUserAsync(user);
+        if (!roleStatus.Succeeded)
+            throw new DefaultException(string.Join(", ", roleStatus.Errors.ToList().Select(e => e.Description)));
         var securityToken = tokenService.CreateToken(user);
         return user.FromUserToNewUser(securityToken);
     }
 
     public async Task<UserDto> LoginUser(LoginUserDto userDto)
     {
-        var loginStatus = await userRepo.LoginAsync(userDto);
-        if (loginStatus.Error != null) 
-            throw new InvalidEntryException(loginStatus.Error);
-        var user = loginStatus.User;
-        return user!;
+        var user = await userRepo.GetUserByUsername(userDto.Username);
+        if (user == null)
+            throw new NotFoundException("User does not exist!");
+        var signInResult = await userRepo.LoginAsync(user, userDto.Password);
+        if (!signInResult.Succeeded)
+            throw new DefaultException("Wrong password!");
+        var securityToken = tokenService.CreateToken(user);
+        return user.FromUserToNewUser(securityToken);
+    }
+
+    public async Task<User> UpdateUser(UpdateUserDto userDto, string username)
+    {
+        var user = await userRepo.GetUserByUsername(username);
+        if (user == null)
+            throw new NotFoundException("User does not exist!");
+        user.Money = userDto.Money;
+        await userRepo.UpdateUser(user);
+        return user;
     }
 }

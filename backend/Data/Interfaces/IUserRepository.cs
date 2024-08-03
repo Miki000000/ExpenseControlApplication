@@ -1,14 +1,14 @@
-using ExpenseControlApplication.Business.Interfaces;
 using ExpenseControlApplication.Data.Entities;
-using ExpenseControlApplication.Data.Factories;
-using ExpenseControlApplication.Data.Repositories;
-using ExpenseControlApplication.Presentation.UserPresentation;
+using Microsoft.AspNetCore.Identity;
 
 namespace ExpenseControlApplication.Data.Interfaces;
 
 public interface IUserRepository
 {
-    public Task<Status> RegisterUserAsync(User user, string password);
+    public Task<IdentityResult> RegisterUserAsync(User user, string password);
+    public Task<IdentityResult> RegisterRoleOnUserAsync(User user);
+    public Task<User?> GetUserByUsername(string username);
+    public Task<SignInResult> LoginAsync(User user, string password);
+    public Task UpdateUser(User user);
     
-    public Task<LoginResult> LoginAsync(LoginUserDto userDto);
 }
