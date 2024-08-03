@@ -7,6 +7,21 @@ public class SpendingDto
     [Required]
     public decimal ValueSpended { get; set; }
 }
+public class GetSpendingDto
+{
+    [Required]
+    public decimal ValueSpended { get; set; }
+    public DateTime SpendingDate { get; set; } = DateTime.Now;
+    public string Username { get; set; } = null!;
+
+}
+
+public class DeleteSpendingDto
+{
+    public int Id { get; set; }
+    
+    public decimal ValueSpended { get; set; }
+}
 public class CreateSpendingDto
 {
     public int Id { get; set; }

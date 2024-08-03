@@ -23,4 +23,23 @@ public static class SpendingMapper
             UserId = spending.UserId,
         };
     }
+
+    public static GetSpendingDto FromSpendingToGetSpendingDto(this Spending spending, string username)
+    {
+        return new GetSpendingDto
+        {
+            Username = username,
+            ValueSpended = spending.ValueSpended,
+            SpendingDate = spending.SpendingDate
+        };
+    }
+
+    public static DeleteSpendingDto FromSpendingToDeleteDto(this Spending spending)
+    {
+        return new DeleteSpendingDto
+        {
+            Id = spending.Id,
+            ValueSpended = spending.ValueSpended
+        };
+    }
 }
