@@ -39,13 +39,20 @@ public class UserServices(IUserRepository userRepo, ITokenService tokenService)
         return user.FromUserToNewUser(securityToken);
     }
 
-    public async Task<User> UpdateUser(UpdateUserDto userDto, string username)
+    public async Task<UserDto> UpdateUser(UpdateUserDto userDto, string username)
     {
         var user = await userRepo.GetUserByUsername(username);
         if (user == null)
             throw new NotFoundException("User does not exist!");
-        user.Money = userDto.Money;
+        user.Money += userDto.Money;
         await userRepo.UpdateUser(user);
-        return user;
+        return user.FromUserToNewUser(username);
+    }
+
+    public async Task<UserDto> GetUserByUsername(string username)
+    {
+        var user = await userRepo.GetUserByUsername(username) ??
+                   throw new NotFoundException("User does not exist.");
+        return user.FromUserToNewUser(username);
     }
 }

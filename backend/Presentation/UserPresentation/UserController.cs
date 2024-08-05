@@ -1,5 +1,7 @@
 using ExpenseControlApplication.Business.Interfaces;
 using ExpenseControlApplication.Utils.Exceptions;
+using ExpenseControlApplication.Utils.Extensions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ExpenseControlApplication.Presentation.UserPresentation;
@@ -19,6 +21,22 @@ public class UserController(IUserServices userServices) : ControllerBase
     public async Task<IActionResult> Login([FromBody] LoginUserDto userDto)
     {
         var user = await userServices.LoginUser(userDto);
+        return Ok(user);
+    }
+
+    [HttpPut]
+    [Authorize]
+    public async Task<IActionResult> UpdateUser([FromBody] UpdateUserDto userDto)
+    {
+        return Ok(await userServices.UpdateUser(userDto, User.GetUsername()));
+    }
+
+    [HttpGet]
+    [Authorize]
+    public async Task<IActionResult> GetUserInfo()
+    {
+        var userName = User.GetUsername();
+        var user = await userServices.GetUserByUsername(userName);
         return Ok(user);
     }
 }
