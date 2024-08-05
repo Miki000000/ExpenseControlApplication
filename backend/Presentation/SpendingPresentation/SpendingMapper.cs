@@ -9,7 +9,9 @@ public static class SpendingMapper
         return new Spending
         {
             ValueSpended = spendingDto.ValueSpended,
-            UserId = userId
+            UserId = userId,
+            Description = spendingDto.Description,
+            ItemBought = spendingDto.ItemBought
         };
     }
 
@@ -21,6 +23,8 @@ public static class SpendingMapper
             SpendingDate = spending.SpendingDate,
             ValueSpended = spending.ValueSpended,
             UserId = spending.UserId,
+            Description = spending.Description,
+            ItemBought = spending.ItemBought
         };
     }
 
@@ -30,7 +34,9 @@ public static class SpendingMapper
         {
             Username = username,
             ValueSpended = spending.ValueSpended,
-            SpendingDate = spending.SpendingDate
+            SpendingDate = spending.SpendingDate,
+            Description = spending.Description,
+            ItemBought = spending.ItemBought
         };
     }
 

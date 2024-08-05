@@ -1,4 +1,5 @@
 using ExpenseControlApplication.Business.Interfaces;
+using ExpenseControlApplication.Data.Entities;
 using ExpenseControlApplication.Data.Interfaces;
 using ExpenseControlApplication.Presentation.SpendingPresentation;
 using ExpenseControlApplication.Utils.Exceptions;
@@ -14,6 +15,8 @@ public class SpendingServices(ISpendingRepository spendingRepo, IUserRepository 
         if (user == null)
             throw new NotFoundException("User not found!");
         if (user.Money <= 0)
+            throw new InvalidEntryException("User does not have the money to do that!");
+        if (user.Money - spendingDto.ValueSpended < 0)
             throw new InvalidEntryException("User does not have the money to do that!");
         var spending = spendingDto.FromCreateToSpending(user.Id);
         var newSpending = await spendingRepo.CreateAsync(spending);
@@ -43,17 +46,30 @@ public class SpendingServices(ISpendingRepository spendingRepo, IUserRepository 
                    throw new NotFoundException("User not found");
         return user.Spendings.Select(s => s.FromSpendingToGetSpendingDto(username)).ToList();
     }
-    public async Task<CreateSpendingDto?> UpdateAsync(UpdateSpendingDto spendingDto, string username)
+    public async Task<CreateSpendingDto?> UpdateAsync(UpdateSpendingDto spendingDto, int id, string username)
     {
         var user = await userRepo.GetUserByUsername(username);
         if (user is null)
             throw new NotFoundException("User not found!");
         if (!user.Spendings.Any())
             throw new NotFoundException("User does not have any spendings");
-        var spending = user.Spendings.FirstOrDefault(s => s.Id == spendingDto.Id);
+        var spending = user.Spendings.FirstOrDefault(s => s.Id == id);
         if (spending is null)
             throw new NotFoundException("Spending not found!");
-        spending.ValueSpended = spendingDto.ValueSpended;
+        if (spendingDto.ValueSpended > spending.ValueSpended)
+        {
+            user.TotalSpent += (decimal)spendingDto.ValueSpended;
+            user.Money -= user.Money - (decimal)spendingDto.ValueSpended == 0 ?
+                throw new InvalidEntryException("User does not have this money.") :
+                (decimal)spendingDto.ValueSpended;
+        }
+        else if (spendingDto.ValueSpended < spending.ValueSpended)
+        {
+            user.TotalSpent -= (decimal)spendingDto.ValueSpended;
+            user.Money += (decimal)spendingDto.ValueSpended;
+        }
+        spending.ValueSpended = spendingDto.ValueSpended ?? spending.ValueSpended;
+        spending.Description = spendingDto.Description ?? spending.Description;
         await spendingRepo.UpdateSpendingAsync();
         return spending.FromSpendingToDto();
     }
@@ -67,6 +83,9 @@ public class SpendingServices(ISpendingRepository spendingRepo, IUserRepository 
         var spending = user.Spendings.FirstOrDefault(s => s.Id == spendingId);
         if (spending == null)
             throw new NotFoundException("Spending");
+        user.Money += spending.ValueSpended;
+        user.TotalSpent -= spending.ValueSpended;
+        await userRepo.UpdateUser(user);
         await spendingRepo.DeleteUserSpendingAsync(spending);
         return spending.FromSpendingToDto();
     }

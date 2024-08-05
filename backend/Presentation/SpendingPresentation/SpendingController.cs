@@ -39,7 +39,7 @@ public class SpendingController(ISpendingServices spendingServices) : Controller
     public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateSpendingDto spendingDto)
     {
         var userName = User.GetUsername();
-        var newSpending = await spendingServices.UpdateAsync(spendingDto, userName);
+        var newSpending = await spendingServices.UpdateAsync(spendingDto, id, userName);
         return Ok(newSpending);
     }
 
