@@ -4,6 +4,7 @@ using ExpenseControlApplication.Data;
 using ExpenseControlApplication.Data.Entities;
 using ExpenseControlApplication.Data.Interfaces;
 using ExpenseControlApplication.Data.Repositories;
+using ExpenseControlApplication.Utils.Configurations;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -26,7 +27,10 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
-builder.Services.AddControllers()
+builder.Services.AddControllers(options =>
+    {
+        options.Filters.Add<ControllerExceptionsConfigurations>();
+    })
     .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
