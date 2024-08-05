@@ -13,6 +13,8 @@ public class SpendingServices(ISpendingRepository spendingRepo, IUserRepository 
         var user = await userRepo.GetUserByUsername(username);
         if (user == null)
             throw new NotFoundException("User not found!");
+        if (user.Money <= 0)
+            throw new InvalidEntryException("User does not have the money to do that!");
         var spending = spendingDto.FromCreateToSpending(user.Id);
         var newSpending = await spendingRepo.CreateAsync(spending);
         user.Money -= spendingDto.ValueSpended;
@@ -34,16 +36,22 @@ public class SpendingServices(ISpendingRepository spendingRepo, IUserRepository 
             throw new NotFoundException("Spending does not exist in the database!");
         return spending.FromSpendingToGetSpendingDto(user.UserName!);
     }
-    
+
+    public async Task<List<GetSpendingDto>> GetAllUserSpendingAsync(string username)
+    {
+        var user = await userRepo.GetUserByUsername(username) ??
+                   throw new NotFoundException("User not found");
+        return user.Spendings.Select(s => s.FromSpendingToGetSpendingDto(username)).ToList();
+    }
     public async Task<CreateSpendingDto?> UpdateAsync(UpdateSpendingDto spendingDto, string username)
     {
         var user = await userRepo.GetUserByUsername(username);
-        if (user == null)
+        if (user is null)
             throw new NotFoundException("User not found!");
         if (!user.Spendings.Any())
             throw new NotFoundException("User does not have any spendings");
         var spending = user.Spendings.FirstOrDefault(s => s.Id == spendingDto.Id);
-        if (spending == null)
+        if (spending is null)
             throw new NotFoundException("Spending not found!");
         spending.ValueSpended = spendingDto.ValueSpended;
         await spendingRepo.UpdateSpendingAsync();
@@ -53,12 +61,12 @@ public class SpendingServices(ISpendingRepository spendingRepo, IUserRepository 
     {
         var user = await userRepo.GetUserByUsername(username);
         if (user == null)
-            throw new NotFoundException("User not found!");
+            throw new NotFoundException($"User: {username}");
         if (!user.Spendings.Any())
-            throw new NotFoundException("User does not have any spendings");
+            throw new NotFoundException("Spendings");
         var spending = user.Spendings.FirstOrDefault(s => s.Id == spendingId);
         if (spending == null)
-            throw new NotFoundException("User does not have this spending in his account");
+            throw new NotFoundException("Spending");
         await spendingRepo.DeleteUserSpendingAsync(spending);
         return spending.FromSpendingToDto();
     }
@@ -67,7 +75,9 @@ public class SpendingServices(ISpendingRepository spendingRepo, IUserRepository 
     {
         var user = await userRepo.GetUserByUsername(username);
         if (user == null)
-            throw new NotFoundException("User not found!");
+            throw new NotFoundException($"User: {username}");
+        if (!user.Spendings.Any())
+            throw new NotFoundException("Spendings");
         var spendingsToDelete = user.Spendings;
         await spendingRepo.DeleteAllUserSpendingAsync(spendingsToDelete);
         return user.Spendings.Select(s => s.FromSpendingToDeleteDto()).ToList();
