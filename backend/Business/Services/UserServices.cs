@@ -14,6 +14,8 @@ public class UserServices(IUserRepository userRepo, ITokenService tokenService)
 {
     public async Task<UserDto> RegisterUser(RegisterUserDto userDto)
     {
+        if (userDto.Money < 0)
+            throw new InvalidEntryException("User has to have more than 0 of currency.");
         var user = userDto.FromDtoToUser();
         var userStatus = await userRepo.RegisterUserAsync(user, userDto.Password);
         if (!userStatus.Succeeded)
