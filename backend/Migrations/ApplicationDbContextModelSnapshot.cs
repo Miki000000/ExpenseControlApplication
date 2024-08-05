@@ -30,6 +30,13 @@ namespace ExpenseControlApplication.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ItemBought")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<DateTime>("SpendingDate")
                         .HasColumnType("timestamp with time zone");
 
@@ -147,13 +154,13 @@ namespace ExpenseControlApplication.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "36e070ec-a3fe-4460-b354-0b5302545e3d",
+                            Id = "06a7310f-44c5-478d-a239-b0e595d31d6d",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "38f3bd2d-657e-41ae-b3fc-ec5e36c23b03",
+                            Id = "87d844d5-8f5c-42c2-bf3a-e1d7fa35ceeb",
                             Name = "User",
                             NormalizedName = "USER"
                         });
