@@ -14,4 +14,5 @@ public interface IUserServices
 {
     public Task<UserDto> RegisterUser(RegisterUserDto userDto);
     public Task<UserDto> LoginUser(LoginUserDto userDto);
+    public Task<User> UpdateUser(UpdateUserDto userDto, string username);
 }
