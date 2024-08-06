@@ -1,3 +1,4 @@
+using ExpenseControlApplication.Data.Configurations;
 using ExpenseControlApplication.Data.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -16,12 +17,7 @@ public class ApplicationDbContext : IdentityDbContext<User>
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        
-        modelBuilder.Entity<User>()
-            .HasMany(u => u.Spendings)
-            .WithOne(s => s.User)
-            .HasForeignKey(s => s.UserId)
-            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.ApplyConfiguration(new UserTableConfiguration());
         
         
         List<IdentityRole> roles = new List<IdentityRole>
