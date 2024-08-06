@@ -3,6 +3,8 @@ using ExpenseControlApplication.Data.Entities;
 using ExpenseControlApplication.Data.Interfaces;
 using ExpenseControlApplication.Presentation.SpendingPresentation;
 using ExpenseControlApplication.Utils.Exceptions;
+using ExpenseControlApplication.Utils.Extensions;
+using ExpenseControlApplication.Utils.Helpers;
 
 namespace ExpenseControlApplication.Business.Services;
 
@@ -40,12 +42,23 @@ public class SpendingServices(ISpendingRepository spendingRepo, IUserRepository 
         return spending.FromSpendingToGetSpendingDto(user.UserName!);
     }
 
-    public async Task<List<GetSpendingDto>> GetAllUserSpendingAsync(string username)
+    public async Task<List<GetSpendingDto>> GetAllUserSpendingAsync(string username, QueryObject queryObject)
     {
         var user = await userRepo.GetUserByUsername(username) ??
                    throw new NotFoundException("User not found");
-        return user.Spendings.Select(s => s.FromSpendingToGetSpendingDto(username)).ToList();
+        var spendings = user.Spendings.AsQueryable() ??
+                        throw new NotFoundException("User has not spendings!");
+        spendings = spendings.FilterBy(new() { filter = "ItemName" }, queryObject.ItemName);
+        spendings = spendings.FilterBy(new() {filter = "Description"} ,queryObject.Description);
+        spendings = spendings.SortSpendings(queryObject.SortBy, queryObject.IsDescending);
+        int skipNumber = (queryObject.PageNumber - 1) * queryObject.PageSize;
+        return spendings
+            .Skip(skipNumber)
+            .Take(queryObject.PageSize)
+            .Select(s => s.FromSpendingToGetSpendingDto(username))
+            .ToList();
     }
+    
     public async Task<CreateSpendingDto?> UpdateAsync(UpdateSpendingDto spendingDto, int id, string username)
     {
         var user = await userRepo.GetUserByUsername(username);

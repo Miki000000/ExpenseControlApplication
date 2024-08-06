@@ -1,5 +1,6 @@
 using ExpenseControlApplication.Data.Entities;
 using ExpenseControlApplication.Presentation.SpendingPresentation;
+using ExpenseControlApplication.Utils.Helpers;
 
 namespace ExpenseControlApplication.Business.Interfaces;
 
@@ -10,5 +11,5 @@ public interface ISpendingServices
     public Task<List<DeleteSpendingDto>> DeleteAllAsync(string username);
     public Task<GetSpendingDto> GetUserSpendingAsync(string username, int spendingId);
     public Task<CreateSpendingDto> DeleteAsync(int spendingId, string username);
-    public Task<List<GetSpendingDto>> GetAllUserSpendingAsync(string username);
+    public Task<List<GetSpendingDto>> GetAllUserSpendingAsync(string username, QueryObject queryObject);
 }

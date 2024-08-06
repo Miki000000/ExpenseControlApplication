@@ -1,5 +1,6 @@
 using ExpenseControlApplication.Business.Interfaces;
 using ExpenseControlApplication.Utils.Extensions;
+using ExpenseControlApplication.Utils.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,11 +20,11 @@ public class SpendingController(ISpendingServices spendingServices) : Controller
     }
     [HttpGet]
     [Authorize]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAll([FromQuery] QueryObject filter)
     {
         var userName = User.GetUsername();
-        var userSpendings = await spendingServices.GetAllUserSpendingAsync(userName);
-        return Ok();
+        var userSpendings = await spendingServices.GetAllUserSpendingAsync(userName, filter);
+        return Ok(userSpendings);
     }
     [HttpGet("{id}")]
     [Authorize]
