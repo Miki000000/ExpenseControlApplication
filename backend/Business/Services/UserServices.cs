@@ -23,6 +23,7 @@ public class UserServices(IUserRepository userRepo, ITokenService tokenService)
         var roleStatus = await userRepo.RegisterRoleOnUserAsync(user);
         if (!roleStatus.Succeeded)
             throw new DefaultException(string.Join(", ", roleStatus.Errors.ToList().Select(e => e.Description)));
+        await userRepo.UpdateUser(user);
         var securityToken = tokenService.CreateToken(user);
         return user.FromUserToNewUser(securityToken);
     }
