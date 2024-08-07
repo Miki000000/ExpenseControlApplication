@@ -16,4 +16,5 @@ public interface IUserServices
     public Task<UserDto> LoginUser(LoginUserDto userDto);
     public Task<UserDto> UpdateUser(UpdateUserDto userDto, string username);
     public Task<UserDto> GetUserByUsername(string username);
+    public Task<List<UserDto>> GetAllUsers(string username);
 }

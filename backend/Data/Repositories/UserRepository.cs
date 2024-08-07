@@ -30,4 +30,16 @@ public class UserRepository(UserManager<User> userManager, SignInManager<User> s
     {
         await userManager.UpdateAsync(user);
     }
+    public async Task<IQueryable<User>> GetAllUsers()
+    {
+        var users = await userManager.Users
+            .Include(u => u.Spendings)
+            .ToListAsync();
+        return users.AsQueryable() ;
+    }
+
+    public async Task<bool> AuthorizeAdminOnUser(User user)
+    {
+        return await userManager.IsInRoleAsync(user, "Admin");
+    }
 }

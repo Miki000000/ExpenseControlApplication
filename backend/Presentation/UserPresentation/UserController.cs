@@ -39,4 +39,13 @@ public class UserController(IUserServices userServices) : ControllerBase
         var user = await userServices.GetUserByUsername(userName);
         return Ok(user);
     }
+
+    [HttpGet("all")]
+    [Authorize]
+    public async Task<IActionResult> GetAllUsersInfo()
+    {
+        var userName = User.GetUsername();
+        var users = await userServices.GetAllUsers(userName);
+        return Ok(users);
+    }
 }

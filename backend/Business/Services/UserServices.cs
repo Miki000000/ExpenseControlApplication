@@ -56,4 +56,14 @@ public class UserServices(IUserRepository userRepo, ITokenService tokenService)
                    throw new NotFoundException("User does not exist.");
         return user.FromUserToNewUser(username);
     }
+
+    public async Task<List<UserDto>> GetAllUsers(string username)
+    {
+        var user = await userRepo.GetUserByUsername(username) ??
+                   throw new NotFoundException("User not found.");
+        var users = await userRepo.AuthorizeAdminOnUser(user)
+            ? await userRepo.GetAllUsers()
+            : throw new InvalidEntryException("User does not have permission.");
+        return users.Select(u => u.FromUserToNewUser(u.UserName!)).ToList();
+    }
 }

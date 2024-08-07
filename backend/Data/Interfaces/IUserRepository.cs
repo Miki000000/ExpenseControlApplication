@@ -10,5 +10,6 @@ public interface IUserRepository
     public Task<User?> GetUserByUsername(string username);
     public Task<SignInResult> LoginAsync(User user, string password);
     public Task UpdateUser(User user);
-    
+    public Task<IQueryable<User>> GetAllUsers();
+    public Task<bool> AuthorizeAdminOnUser(User user);
 }
