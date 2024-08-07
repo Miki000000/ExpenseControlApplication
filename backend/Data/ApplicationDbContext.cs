@@ -18,14 +18,6 @@ public class ApplicationDbContext : IdentityDbContext<User>
     {
         base.OnModelCreating(modelBuilder);
         modelBuilder.ApplyConfiguration(new UserTableConfiguration());
-        
-        
-        List<IdentityRole> roles = new List<IdentityRole>
-        {
-            new IdentityRole{ Name = "Admin", NormalizedName = "ADMIN"},
-            new IdentityRole{ Name = "User", NormalizedName = "USER"}
-        };
-        modelBuilder.Entity<IdentityRole>()
-            .HasData(roles);
+        modelBuilder.ApplyConfiguration(new RolesTableConfiguration());
     }
 }
