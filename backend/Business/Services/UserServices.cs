@@ -30,8 +30,7 @@ public class UserServices(IUserRepository userRepo, ITokenService tokenService)
 
     public async Task<UserDto> LoginUser(LoginUserDto userDto)
     {
-        var user = await userRepo.GetUserByUsername(userDto.Username);
-        if (user == null)
+        var user = await userRepo.GetUserByUsername(userDto.Username) ??
             throw new NotFoundException("User does not exist!");
         var signInResult = await userRepo.LoginAsync(user, userDto.Password);
         if (!signInResult.Succeeded)
@@ -42,8 +41,7 @@ public class UserServices(IUserRepository userRepo, ITokenService tokenService)
 
     public async Task<UserDto> UpdateUser(UpdateUserDto userDto, string username)
     {
-        var user = await userRepo.GetUserByUsername(username);
-        if (user == null)
+        var user = await userRepo.GetUserByUsername(username) ??
             throw new NotFoundException("User does not exist!");
         user.Money += userDto.Money;
         await userRepo.UpdateUser(user);
