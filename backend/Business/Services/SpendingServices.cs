@@ -55,27 +55,15 @@ public class SpendingServices(ISpendingRepository spendingRepo, IUserRepository 
             .Select(s => s.FromSpendingToGetSpendingDto(username))
             .ToList();
     }
-    
     public async Task<CreateSpendingDto?> UpdateAsync(UpdateSpendingDto spendingDto, int id, string username)
     {
         var user = await userRepo.GetUserByUsername(username) ??
                    throw new NotFoundException("User not found!");
-        if (!user.Spendings.Any())
-            throw new NotFoundException("User does not have any spendings");
         var spending = user.Spendings.FirstOrDefault(s => s.Id == id) ??
                        throw new NotFoundException("Spending not found!");
-        if (spendingDto.ValueSpended > spending.ValueSpended)
-        {
-            user.TotalSpent += (decimal)spendingDto.ValueSpended;
-            user.Money -= user.Money - (decimal)spendingDto.ValueSpended == 0 ?
-                throw new InvalidEntryException("User does not have this money.") :
-                (decimal)spendingDto.ValueSpended;
-        }
-        else if (spendingDto.ValueSpended < spending.ValueSpended)
-        {
-            user.TotalSpent -= (decimal)spendingDto.ValueSpended;
-            user.Money += (decimal)spendingDto.ValueSpended;
-        }
+        var spendingDifference = spendingDto.ValueSpended - spending.ValueSpended ?? 0;
+        user.TotalSpent += spendingDifference;
+        user.Money += spendingDifference;
         spending.ValueSpended = spendingDto.ValueSpended ?? spending.ValueSpended;
         spending.Description = spendingDto.Description ?? spending.Description;
         await spendingRepo.UpdateSpendingAsync();
